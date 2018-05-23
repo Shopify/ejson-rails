@@ -1,5 +1,7 @@
 # EJSON::Rails
 
+[![Build Status](https://travis-ci.com/Shopify/ejson-rails.svg?token=ShuwwQhmf65yNstgcUSy&branch=master)](https://travis-ci.com/Shopify/ejson-rails)
+
 Automatically injects `ejson` decrypted secrets into your `Rails.application.secrets`.
 
 ## Installation
