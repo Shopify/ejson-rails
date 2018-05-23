@@ -1,8 +1,6 @@
 # EJSON::Rails
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/ejson/rails`. To experiment with that code, run `bin/console` for an interactive prompt.
-
-TODO: Delete this and the text above, and describe your gem
+Automatically injects `ejson` decrypted secrets into your `Rails.application.secrets`.
 
 ## Installation
 
@@ -22,7 +20,14 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+Decrypted secrets from `project/config/secrets.json` (or `project/config/secrets.{current_rails_environment}.json` if that doesn't exist) will be accessible via `Rails.application.secrets`. For example:
+
+```json
+// project/config/secrets.json
+{ "some_secret": "key" }
+```
+
+will be accessible via `Rails.application.secrets.some_secret` or `Rails.application.secrets[:some_secret]` on boot. JSON files are loaded once and contents are `deep_merge`'d into your app's existing rails secrets.
 
 ## Development
 
@@ -32,7 +37,7 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/ejson-rails.
+Bug reports and pull requests are welcome on GitHub at https://github.com/Shopify/ejson-rails.
 
 ## License
 
