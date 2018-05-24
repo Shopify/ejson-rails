@@ -1,8 +1,8 @@
 PATH
   remote: .
   specs:
-    ejson-rails (1.1.0)
-      ejson (= 1.1.0)
+    ejson-rails (0.1.0)
+      ejson
       railties (>= 4.1)
 
 GEM
