@@ -9,7 +9,7 @@ module RailsHelper
     ActiveSupport::OrderedOptions
   end
 
-  def run_initializers_of(railtie)
-    railtie.initializers.each(&:run)
+  def run_load_hooks
+    ActiveSupport.run_load_hooks(:before_configuration)
   end
 end

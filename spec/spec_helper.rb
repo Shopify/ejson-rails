@@ -5,6 +5,7 @@ require "rails"
 require "ejson/rails"
 
 require_relative "support/path_helper"
+require_relative "support/file_helper"
 require_relative "support/rails_helper"
 
 RSpec.configure do |config|
@@ -19,5 +20,6 @@ RSpec.configure do |config|
   end
 
   config.include PathHelper
+  config.include FileHelper
   config.include RailsHelper
 end
