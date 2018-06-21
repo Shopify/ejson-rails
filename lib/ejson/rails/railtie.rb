@@ -6,7 +6,7 @@ module EJSON
     private_constant :Rails
 
     class Railtie < Rails::Railtie
-      initializer "ejson-rails.merge_secrets" do
+      config.before_configuration do
         json_files.each do |file|
           next unless valid?(file)
           secrets = JSON.parse(file.read, symbolize_names: true)
@@ -14,17 +14,19 @@ module EJSON
         end
       end
 
-      private
+      class << self
+        private
 
-      def valid?(pathname)
-        pathname.exist?
-      end
+        def valid?(pathname)
+          pathname.exist?
+        end
 
-      def json_files
-        [
-          Rails.root.join("config", "secrets.json"),
-          Rails.root.join("config", "secrets.#{Rails.env}.json"),
-        ]
+        def json_files
+          [
+            Rails.root.join("config", "secrets.json"),
+            Rails.root.join("config", "secrets.#{Rails.env}.json"),
+          ]
+        end
       end
     end
   end
