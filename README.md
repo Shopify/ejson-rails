@@ -31,6 +31,8 @@ Decrypted secrets from `project/config/secrets.json` (or `project/config/secrets
 
 will be accessible via `Rails.application.secrets.some_secret` or `Rails.application.secrets[:some_secret]` on boot. JSON files are loaded once and contents are `deep_merge`'d into your app's existing rails secrets.
 
+NOTE: This gem does not decrypt ejson for you. You will need to configure this as part of your deployment pipeline.
+
 ## Development
 
 After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
