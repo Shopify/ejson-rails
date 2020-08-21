@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.com/Shopify/ejson-rails.svg?token=ShuwwQhmf65yNstgcUSy&branch=master)](https://travis-ci.com/Shopify/ejson-rails)
 
-Automatically injects `ejson` decrypted secrets into your `Rails.application.secrets`.
+Automatically injects [`ejson`](https://github.com/Shopify/ejson) decrypted secrets into your `Rails.application.secrets`.
 
 ## Installation
 
@@ -30,6 +30,8 @@ Decrypted secrets from `project/config/secrets.json` (or `project/config/secrets
 ```
 
 will be accessible via `Rails.application.secrets.some_secret` or `Rails.application.secrets[:some_secret]` on boot. JSON files are loaded once and contents are `deep_merge`'d into your app's existing rails secrets.
+
+NOTE: This gem does not decrypt ejson for you. You will need to configure this as part of your deployment pipeline.
 
 ## Development
 
