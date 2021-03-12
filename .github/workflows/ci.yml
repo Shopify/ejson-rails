@@ -24,4 +24,4 @@ jobs:
         run: bundle exec rubocop --fail-fast
 
       - name: Test
-        run: bundle exec rake test
+        run: bundle exec rake spec
