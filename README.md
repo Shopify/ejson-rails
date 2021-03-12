@@ -1,6 +1,6 @@
 # EJSON::Rails
 
-[![Build Status](https://travis-ci.com/Shopify/ejson-rails.svg?token=ShuwwQhmf65yNstgcUSy&branch=master)](https://travis-ci.com/Shopify/ejson-rails)
+[![Build Status](https://github.com/Shopify/ejson-rails/workflows/CI/badge.svg?branch=main)](https://github.com/Shopify/ejson-rails/actions?query=branch%3Amain)
 
 Automatically injects [`ejson`](https://github.com/Shopify/ejson) decrypted secrets into your `Rails.application.secrets`.
 
