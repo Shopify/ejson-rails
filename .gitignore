@@ -9,6 +9,3 @@
 
 # rspec failure tracking
 .rspec_status
-
-# rubocop config
-.rubocop-http-*
