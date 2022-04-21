@@ -9,6 +9,7 @@ module EJSON
       config.before_configuration do
         json_files.each do |file|
           next unless valid?(file)
+
           secrets = JSON.parse(file.read, symbolize_names: true)
           break Rails.application.secrets.deep_merge!(secrets)
         end
