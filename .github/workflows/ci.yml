@@ -23,7 +23,7 @@ jobs:
     env:
       BUNDLE_GEMFILE: gemfiles/${{ matrix.entry.gemfile }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         name: Checkout
 
       - uses: ruby/setup-ruby@v1
