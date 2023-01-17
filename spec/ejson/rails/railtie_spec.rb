@@ -6,7 +6,7 @@ RSpec.describe(EJSON::Rails::Railtie) do
   let(:secrets) { secrets_class.new }
 
   it "should be a Railtie" do
-    is_expected.to(be_a(::Rails::Railtie))
+    is_expected.to(be_a(Rails::Railtie))
   end
 
   context "before configuration" do
@@ -34,7 +34,7 @@ RSpec.describe(EJSON::Rails::Railtie) do
         expect(secrets).to(include(secret: "test_api_key"))
       end
 
-      it "does not load anything when Rails.env doesn\'t match" do
+      it "does not load anything when Rails.env doesn't match" do
         expect(Rails).to(receive(:env).and_return(:production))
         run_load_hooks
         expect(secrets).to(be_empty)
