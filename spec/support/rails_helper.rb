@@ -9,6 +9,15 @@ module RailsHelper
     ActiveSupport::OrderedOptions
   end
 
+  def credentials_object
+    ActiveSupport::EncryptedConfiguration.new(
+      config_path: "file.enc",
+      key_path: "keyfile.key",
+      env_key: "RAILS_KEY",
+      raise_if_missing_key: false,
+    )
+  end
+
   def run_load_hooks
     ActiveSupport.run_load_hooks(:before_configuration)
   end

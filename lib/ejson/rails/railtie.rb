@@ -12,6 +12,11 @@ module EJSON
 
         secrets = JSON.parse(json_file.read, symbolize_names: true)
         Rails.application.secrets.deep_merge!(secrets)
+        # Merging into `credentials.config` because in Rails 7.0, reading a credential with
+        # Rails.application.credentials[:some_credential] won't work otherwise.
+        Rails.application.credentials.config.deep_merge!(secrets) do |key|
+          raise "A credential already exists with the same name: #{key}"
+        end
       end
 
       class << self
