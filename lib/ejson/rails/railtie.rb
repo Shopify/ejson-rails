@@ -7,12 +7,11 @@ module EJSON
 
     class Railtie < Rails::Railtie
       config.before_configuration do
-        json_files.each do |file|
-          next unless valid?(file)
+        json_file = json_files.detect { |file| valid?(file) }
+        next unless json_file
 
-          secrets = JSON.parse(file.read, symbolize_names: true)
-          break Rails.application.secrets.deep_merge!(secrets)
-        end
+        secrets = JSON.parse(json_file.read, symbolize_names: true)
+        Rails.application.secrets.deep_merge!(secrets)
       end
 
       class << self
