@@ -27,6 +27,12 @@ RSpec.describe(EJSON::Rails::Railtie) do
       expect(credentials.config).to(include(:secret))
     end
 
+    it "raises if an application credential would be overwritten" do
+      credentials.config[:secret] = "some-credential"
+      expect { run_load_hooks }
+        .to(raise_error("A credential already exists with the same name: secret"))
+    end
+
     it "prioritizes secrets.json" do
       run_load_hooks
       expect(secrets).to(include(secret: "real_api_key"))
@@ -55,6 +61,16 @@ RSpec.describe(EJSON::Rails::Railtie) do
         expect(Rails).to(receive(:env).and_return(:production))
         run_load_hooks
         expect(secrets).to(be_empty)
+      end
+    end
+
+    context "with set_secrets = false" do
+      it "does not merge secrets into application secrets" do
+        described_class.set_secrets = false
+        run_load_hooks
+        expect(secrets).to(be_empty)
+      ensure
+        described_class.set_secrets = true
       end
     end
   end
