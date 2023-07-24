@@ -6,12 +6,19 @@ module EJSON
     private_constant :Rails
 
     class Railtie < Rails::Railtie
-      config.before_configuration do
-        json_files.each do |file|
-          next unless valid?(file)
+      singleton_class.attr_accessor(:set_secrets)
+      @set_secrets = true
 
-          secrets = JSON.parse(file.read, symbolize_names: true)
-          break Rails.application.secrets.deep_merge!(secrets)
+      config.before_configuration do
+        json_file = json_files.detect { |file| valid?(file) }
+        next unless json_file
+
+        secrets = JSON.parse(json_file.read, symbolize_names: true)
+        Rails.application.secrets.deep_merge!(secrets) if set_secrets
+        # Merging into `credentials.config` because in Rails 7.0, reading a credential with
+        # Rails.application.credentials[:some_credential] won't work otherwise.
+        Rails.application.credentials.config.deep_merge!(secrets) do |key|
+          raise "A credential already exists with the same name: #{key}"
         end
       end
 
