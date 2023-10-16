@@ -24,12 +24,12 @@ Or install it yourself as:
 
 Decrypted secrets from `project/config/secrets.json` (or `project/config/secrets.{current_rails_environment}.json` if that doesn't exist) will be accessible via `Rails.application.secrets`. For example:
 
+`# project/config/secrets.json`
 ```json
-// project/config/secrets.json
 { "some_secret": "key" }
 ```
 
-will be accessible via `Rails.application.secrets.some_secret` or `Rails.application.secrets[:some_secret]` on boot. JSON files are loaded once and contents are `deep_merge`'d into your app's existing rails secrets.
+will be accessible via `Rails.application.secrets.some_secret` or `Rails.application.secrets[:some_secret]` upon booting. JSON files are loaded once and contents are `deep_merge`'d into your app's existing rails secrets.
 
 Secrets will also be accessible via `Rails.application.credentials`, e.g. `Rails.application.credentials.some_secret` or `Rails.application.credentials[:some_secret]`. To avoid subtle compatibility issues, if a credential already exists, an error will occur.
 
@@ -39,16 +39,31 @@ NOTE: This gem does not decrypt ejson for you. You will need to configure this a
 
 Rails 7.1 has deprecated application secrets in favor of credentials. ejson-rails can migrate secrets to application credentials.
 
-Even before running Rails 7.1, you can migrate your secrets in a few steps.
+Even before running Rails 7.1, you can migrate your secrets in several steps:
+1. Convert secrets from YAML to JSON
+2. Move any ERB embedded within the YAML to the corresponding environment file
+3. Use `Rails.application.credentials` in place of Rails secrets
 
-First, move the development and test secrets to JSON secrets:
+### 1. Convert secrets from config/secrets.yml to config/secrets.json
+
+Typically, secrets share the same structure across different environments. While test secrets are often placeholders, development secrets may sometimes use environment variables to communicate with external services.
+In that case, the easiest way to migrate is to use the test secrets in all local environments, and override for development as needed:
 
 ```sh-session
-bin/rails runner 'Rails.root.join("config/secrets.#{Rails.env}.json").write(JSON.pretty_generate(Rails.application.secrets.to_h.without(:secret_key_base)))'
-bin/rails runner -e test 'Rails.root.join("config/secrets.#{Rails.env}.json").write(JSON.pretty_generate(Rails.application.secrets.to_h.without(:secret_key_base)))'
+bin/rails runner -e test 'Rails.root.join("config/secrets.json").write(JSON.pretty_generate(Rails.application.secrets.to_h.without(:secret_key_base)))'
 ```
 
-Secrets support ERB while EJSON secrets don't, so if your secrets contain ERB, you will need to move that logic to the environment configurations:
+> [!NOTE]
+> Alternatively, if its necessary to configure distinct values between the development/test environment, you can use separate json files for the development/test environments:
+>
+> ```sh-session
+> bin/rails runner 'Rails.root.join("config/secrets.#{Rails.env}.json").write(JSON.pretty_generate(Rails.application.secrets.to_h.without(:secret_key_base)))'
+> bin/rails runner -e test 'Rails.root.join("config/secrets.#{Rails.env}.json").write(JSON.pretty_generate(Rails.application.secrets.to_h.without(:secret_key_base)))'
+> ```
+
+### 2. Move any ERB into the corresponding environment files
+
+YAML supports ERB while JSON secrets do not. If your secrets contain ERB, you will need to move that logic to the corresponding environment file:
 
 **Before**:
 
@@ -76,15 +91,14 @@ development:
 Rails.application.configure do
   # elided
 
-  # credential should be set using []=, not the dynamic accessors
-  credentials[:some_external_service][:api_token] = ENV.fetch("SOME_EXTERNAL_SERVICE_API_TOKEN", "12345")
-
-  # top-level values must be set through `credentials.config`
-  credentials.config[:something_else_entirely] = ENV.fetch("SOMETHING_ELSE_ENTIRELY", "abc")
+  credentials.some_external_service.api_token = ENV.fetch("SOME_EXTERNAL_SERVICE_API_TOKEN", "12345")
+  credentials.something_else_entirely = ENV.fetch("SOMETHING_ELSE_ENTIRELY", "abc")
 end
 ```
 
-Note that the code accesses the credentials as a Hash with `[]` and `[]=`. This is important because the dynamic accessor methods will set values in a different object, and credentials will behave inconsistently after that:
+#### Rails 7.0 Note
+> [!NOTE]
+> In Rails 7.0, credentials are accessed as a Hash with [] and []=.. This is important because the dynamic accessor methods will set values in a different object, and credentials will behave inconsistently after that:
 
 ```ruby
 Rails.application.credentials.some_external_service.api_token = "foo"
@@ -106,7 +120,9 @@ Rails.application.credentials[:some_external_service][:api_token] = "foo"
 Rails.application.credentials.some_external_service.api_token # => "12345"
 ```
 
-You're now ready to use credentials instead of secrets:
+### 3. Use `Rails.application.credentials`
+
+You are now ready to replace Rails secrets with Rails credentials:
 
 ```sh-session
 git ls-files | xargs ruby -pi -e 'gsub("Rails.application.secrets", "Rails.application.credentials")' --
@@ -118,7 +134,7 @@ To avoid the deprecation warning from the use of secrets in `ejson-rails` once y
 gem 'ejson-rails', require: 'ejson/rails/skip_secrets'
 ```
 
-This will no longer merge secrets from JSON in `Rails.application.secrets`. This will be the default in the next major version.
+This will no longer merge secrets from JSON into `Rails.application.secrets`. This will be the default in the next major version.
 
 ## Development
 
