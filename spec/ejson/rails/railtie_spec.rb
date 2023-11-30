@@ -5,6 +5,10 @@ RSpec.describe(EJSON::Rails::Railtie) do
 
   let(:secrets) { secrets_class.new }
   let(:credentials) { credentials_object }
+  let(:production_env) { ActiveSupport::EnvironmentInquirer.new("production") }
+  let(:default_env) { ActiveSupport::EnvironmentInquirer.new("env") }
+
+
 
   it "should be a Railtie" do
     is_expected.to(be_a(Rails::Railtie))
@@ -42,13 +46,13 @@ RSpec.describe(EJSON::Rails::Railtie) do
       before { hide_secrets_files(secrets_json) }
 
       it "falls back to secrets.env.json" do
-        expect(Rails).to(receive(:env).and_return(:env))
+        expect(Rails).to(receive(:env).twice.and_return(default_env))
         run_load_hooks
         expect(secrets).to(include(secret: "test_api_key"))
       end
 
       it "does not load anything when Rails.env doesn't match" do
-        expect(Rails).to(receive(:env).and_return(:production))
+        expect(Rails).to(receive(:env).and_return(production_env))
         run_load_hooks
         expect(secrets).to(be_empty)
       end
@@ -58,7 +62,7 @@ RSpec.describe(EJSON::Rails::Railtie) do
       before { hide_secrets_files(secrets_json, environment_secrets_json) }
 
       it "does not load anything" do
-        expect(Rails).to(receive(:env).and_return(:production))
+        expect(Rails).to(receive(:env).and_return(production_env))
         run_load_hooks
         expect(secrets).to(be_empty)
       end
