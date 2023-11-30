@@ -16,4 +16,8 @@ module PathHelper
   def environment_secrets_json
     fixtures_root.join("config", "secrets.env.json")
   end
+
+  def production_secrets_json
+    fixtures_root.join("config", "secrets.production.json")
+  end
 end

@@ -6,9 +6,8 @@ RSpec.describe(EJSON::Rails::Railtie) do
   let(:secrets) { secrets_class.new }
   let(:credentials) { credentials_object }
   let(:production_env) { ActiveSupport::EnvironmentInquirer.new("production") }
+  let(:staging_env) { ActiveSupport::EnvironmentInquirer.new("staging") }
   let(:default_env) { ActiveSupport::EnvironmentInquirer.new("env") }
-
-
 
   it "should be a Railtie" do
     is_expected.to(be_a(Rails::Railtie))
@@ -19,6 +18,7 @@ RSpec.describe(EJSON::Rails::Railtie) do
       allow_rails.to(receive(:root).and_return(fixtures_root))
       allow_rails.to(receive_message_chain("application.secrets").and_return(secrets))
       allow_rails.to(receive_message_chain("application.credentials").and_return(credentials))
+      allow(File).to(receive(:delete))
     end
 
     it "merges secrets into application secrets" do
@@ -52,7 +52,7 @@ RSpec.describe(EJSON::Rails::Railtie) do
       end
 
       it "does not load anything when Rails.env doesn't match" do
-        expect(Rails).to(receive(:env).and_return(production_env))
+        expect(Rails).to(receive(:env).and_return(staging_env))
         run_load_hooks
         expect(secrets).to(be_empty)
       end
@@ -62,7 +62,7 @@ RSpec.describe(EJSON::Rails::Railtie) do
       before { hide_secrets_files(secrets_json, environment_secrets_json) }
 
       it "does not load anything" do
-        expect(Rails).to(receive(:env).and_return(production_env))
+        expect(Rails).to(receive(:env).and_return(staging_env))
         run_load_hooks
         expect(secrets).to(be_empty)
       end
@@ -75,6 +75,26 @@ RSpec.describe(EJSON::Rails::Railtie) do
         expect(secrets).to(be_empty)
       ensure
         described_class.set_secrets = true
+      end
+    end
+
+    describe "deleting the JSON files" do
+      context "in production environments" do
+        before { allow_rails.to(receive(:env).and_return(production_env)) }
+        it "deletes the JSON files" do
+          expect(File).to(receive(:delete).once.ordered.with(secrets_json))
+          expect(File).to(receive(:delete).once.ordered.with(production_secrets_json))
+          run_load_hooks
+        end
+      end
+
+      context "in non-production environments" do
+        before { allow_rails.to(receive(:env).and_return(staging_env)) }
+
+        it "does not delete the JSON files" do
+          expect(File).not_to(receive(:delete))
+          run_load_hooks
+        end
       end
     end
   end

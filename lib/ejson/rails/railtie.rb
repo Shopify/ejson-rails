@@ -23,7 +23,9 @@ module EJSON
 
         # Delete the loaded JSON files so they are no longer readable by the app.
         if Rails.env.production?
-          json_files.each { |file| file.delete if file.writeable? }
+          json_files.each do |pathname|
+            File.delete pathname if File.writable? pathname
+          end
         end
       end
 
