@@ -33,6 +33,8 @@ will be accessible via `Rails.application.secrets.some_secret` or `Rails.applica
 
 Secrets will also be accessible via `Rails.application.credentials`, e.g. `Rails.application.credentials.some_secret` or `Rails.application.credentials[:some_secret]`. To avoid subtle compatibility issues, if a credential already exists, an error will occur.
 
+If you set the `EJSON_RAILS_DELETE_SECRETS` environment variable to `true` the gem will automatically delete the secrets from the filesystem after loading them into Rails. It will delete both paths (`project/config/secrets.json` and `project/config/secrets.{current_rails_environment}.json`) if the files exist and are writable.
+
 NOTE: This gem does not decrypt ejson for you. You will need to configure this as part of your deployment pipeline.
 
 ## Migrating to credentials
