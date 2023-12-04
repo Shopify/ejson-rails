@@ -20,6 +20,13 @@ module EJSON
         Rails.application.credentials.config.deep_merge!(secrets) do |key|
           raise "A credential already exists with the same name: #{key}"
         end
+
+        # Delete the loaded JSON files so they are no longer readable by the app.
+        if ENV["EJSON_RAILS_DELETE_SECRETS"] == "true"
+          json_files.each do |pathname|
+            File.delete(pathname) if File.writable?(pathname)
+          end
+        end
       end
 
       class << self

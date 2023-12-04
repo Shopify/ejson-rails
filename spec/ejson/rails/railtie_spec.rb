@@ -73,5 +73,41 @@ RSpec.describe(EJSON::Rails::Railtie) do
         described_class.set_secrets = true
       end
     end
+
+    describe "deleting the JSON files" do
+      before do
+        allow(ENV).to(receive(:[]).and_call_original)
+        allow(ENV).to(receive(:[]).with("EJSON_RAILS_DELETE_SECRETS").and_return(ejson_rails_delete_secrets))
+        allow(Rails).to(receive(:env).and_return(:env))
+      end
+
+      context "when EJSON_RAILS_DELETE_SECRETS equals true" do
+        let(:ejson_rails_delete_secrets) { "true" }
+
+        it "deletes the JSON files" do
+          expect(File).to(receive(:delete).once.ordered.with(secrets_json))
+          expect(File).to(receive(:delete).once.ordered.with(environment_secrets_json))
+          run_load_hooks
+        end
+      end
+
+      context "when EJSON_RAILS_DELETE_SECRETS equals anything other than true" do
+        let(:ejson_rails_delete_secrets) { "nope" }
+
+        it "does not delete the JSON files" do
+          expect(File).not_to(receive(:delete))
+          run_load_hooks
+        end
+      end
+
+      context "when EJSON_RAILS_DELETE_SECRETS is not set" do
+        let(:ejson_rails_delete_secrets) {}
+
+        it "does not delete the JSON files" do
+          expect(File).not_to(receive(:delete))
+          run_load_hooks
+        end
+      end
+    end
   end
 end
