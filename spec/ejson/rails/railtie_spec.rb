@@ -72,7 +72,7 @@ RSpec.describe(EJSON::Rails::Railtie) do
         end
       end
 
-      context "when ejson_secret_source is a proc which yields secrets" do
+      context "when ejson_secret_source is a spec/ejson/rails/railtie_spec.rb which yields secrets" do
         before { described_class.ejson_secret_source = proc { '{"secret": "secret_from_ejson_secret_source"}' } }
 
         it "loads the return value to Rails secrets" do
@@ -81,7 +81,7 @@ RSpec.describe(EJSON::Rails::Railtie) do
         end
       end
 
-      context "when ejson_secret_source is a proc which does not yield secrets" do
+      context "when ejson_secret_source is a callable which does not yield secrets" do
         before { described_class.ejson_secret_source = proc {} }
         it "falls back to default behavior of loading secrets from disk" do
           run_load_hooks
