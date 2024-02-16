@@ -34,7 +34,7 @@ module EJSON
         private
 
         def load_secrets_from_config
-          ejson_secret_source&.yield
+          ejson_secret_source&.call
         end
 
         def load_secrets_from_disk
