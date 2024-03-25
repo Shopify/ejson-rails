@@ -3,7 +3,7 @@ PATH
   specs:
     ejson-rails (0.2.1)
       ejson
-      railties (>= 5.2)
+      railties (>= 6.1)
 
 GEM
   remote: https://rubygems.org/
@@ -145,4 +145,4 @@ DEPENDENCIES
   rubocop-shopify
 
 BUNDLED WITH
-   2.3.17
+   2.5.7
