@@ -64,6 +64,32 @@ RSpec.describe(EJSON::Rails::Railtie) do
       end
     end
 
+    describe "dynamic secret source configuration" do
+      context "when no ejson_secret_source is configured" do
+        it "falls back to loading secrets from disk" do
+          run_load_hooks
+          expect(secrets).to(include(secret: "real_api_key"))
+        end
+      end
+
+      context "when ejson_secret_source is a spec/ejson/rails/railtie_spec.rb which yields secrets" do
+        before { described_class.ejson_secret_source = proc { '{"secret": "secret_from_ejson_secret_source"}' } }
+
+        it "loads the return value to Rails secrets" do
+          run_load_hooks
+          expect(secrets).to(include(secret: "secret_from_ejson_secret_source"))
+        end
+      end
+
+      context "when ejson_secret_source is a callable which does not yield secrets" do
+        before { described_class.ejson_secret_source = proc {} }
+        it "falls back to default behavior of loading secrets from disk" do
+          run_load_hooks
+          expect(secrets).to(include(secret: "real_api_key"))
+        end
+      end
+    end
+
     context "with set_secrets = false" do
       it "does not merge secrets into application secrets" do
         described_class.set_secrets = false
