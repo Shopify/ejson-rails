@@ -5,8 +5,8 @@ RSpec.describe(EJSON::Rails::Railtie) do
 
   let(:rails) { class_double(Rails).as_stubbed_const }
   let(:rails_application) { instance_double(Rails::Application) }
-  let(:secrets) { secrets_class.new }
-  let(:credentials) { credentials_object }
+  let(:rails_credentials) { credentials_object }
+  let(:credentials) { rails_credentials.config }
 
   it "should be a Railtie" do
     is_expected.to(be_a(Rails::Railtie))
@@ -17,29 +17,23 @@ RSpec.describe(EJSON::Rails::Railtie) do
       allow(Rails).to(receive(:env).and_return(nil))
       allow(Rails).to(receive(:root).and_return(fixtures_root))
       allow(Rails).to(receive(:application).and_return(rails_application))
-      allow(Rails.application).to(receive(:secrets).and_return(secrets))
-      allow(Rails.application).to(receive(:credentials).and_return(credentials))
+      allow(Rails.application).to(receive(:credentials).and_return(rails_credentials))
     end
 
-    it "merges secrets into application secrets" do
+    it "merges JSON secrets into application credentials" do
       run_load_hooks
-      expect(secrets).to(include(:secret))
-    end
-
-    it "merges secrets into application credentials" do
-      run_load_hooks
-      expect(credentials.config).to(include(:secret))
+      expect(credentials).to(include(:secret))
     end
 
     it "raises if an application credential would be overwritten" do
-      credentials.config[:secret] = "some-credential"
+      Rails.application.credentials.config[:secret] = "some-credential"
       expect { run_load_hooks }
         .to(raise_error("A credential already exists with the same name: secret"))
     end
 
     it "prioritizes secrets.json" do
       run_load_hooks
-      expect(secrets).to(include(secret: "real_api_key"))
+      expect(credentials).to(include(secret: "real_api_key"))
     end
 
     context "without secrets.json" do
@@ -48,13 +42,13 @@ RSpec.describe(EJSON::Rails::Railtie) do
       it "falls back to secrets.env.json" do
         expect(Rails).to(receive(:env).and_return(:env))
         run_load_hooks
-        expect(secrets).to(include(secret: "test_api_key"))
+        expect(credentials).to(include(secret: "test_api_key"))
       end
 
       it "does not load anything when Rails.env doesn't match" do
         expect(Rails).to(receive(:env).and_return(:production))
         run_load_hooks
-        expect(secrets).to(be_empty)
+        expect(credentials).to(be_empty)
       end
     end
 
@@ -64,7 +58,7 @@ RSpec.describe(EJSON::Rails::Railtie) do
       it "does not load anything" do
         expect(Rails).to(receive(:env).and_return(:production))
         run_load_hooks
-        expect(secrets).to(be_empty)
+        expect(credentials).to(be_empty)
       end
     end
 
@@ -72,7 +66,7 @@ RSpec.describe(EJSON::Rails::Railtie) do
       context "when no ejson_secret_source is configured" do
         it "falls back to loading secrets from disk" do
           run_load_hooks
-          expect(secrets).to(include(secret: "real_api_key"))
+          expect(credentials).to(include(secret: "real_api_key"))
         end
       end
 
@@ -81,7 +75,7 @@ RSpec.describe(EJSON::Rails::Railtie) do
 
         it "loads the return value to Rails secrets" do
           run_load_hooks
-          expect(secrets).to(include(secret: "secret_from_ejson_secret_source"))
+          expect(credentials).to(include(secret: "secret_from_ejson_secret_source"))
         end
       end
 
@@ -89,18 +83,8 @@ RSpec.describe(EJSON::Rails::Railtie) do
         before { described_class.ejson_secret_source = proc {} }
         it "falls back to default behavior of loading secrets from disk" do
           run_load_hooks
-          expect(secrets).to(include(secret: "real_api_key"))
+          expect(credentials).to(include(secret: "real_api_key"))
         end
-      end
-    end
-
-    context "with set_secrets = false" do
-      it "does not merge secrets into application secrets" do
-        described_class.set_secrets = false
-        run_load_hooks
-        expect(secrets).to(be_empty)
-      ensure
-        described_class.set_secrets = true
       end
     end
 

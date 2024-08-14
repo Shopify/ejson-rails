@@ -1,10 +1,6 @@
 # frozen_string_literal: true
 
 module RailsHelper
-  def secrets_class
-    ActiveSupport::OrderedOptions
-  end
-
   def credentials_object
     ActiveSupport::EncryptedConfiguration.new(
       config_path: "file.enc",
