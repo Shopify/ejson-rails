@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    ejson-rails (0.2.2)
+    ejson-rails (1.0.0)
       ejson
       railties (>= 6.1)
 
