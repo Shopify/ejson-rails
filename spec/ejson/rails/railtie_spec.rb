@@ -3,6 +3,8 @@
 RSpec.describe(EJSON::Rails::Railtie) do
   subject { described_class.instance }
 
+  let(:rails) { class_double(Rails).as_stubbed_const }
+  let(:rails_application) { instance_double(Rails::Application) }
   let(:secrets) { secrets_class.new }
   let(:credentials) { credentials_object }
 
@@ -12,9 +14,11 @@ RSpec.describe(EJSON::Rails::Railtie) do
 
   context "before configuration" do
     before do
-      allow_rails.to(receive(:root).and_return(fixtures_root))
-      allow_rails.to(receive_message_chain("application.secrets").and_return(secrets))
-      allow_rails.to(receive_message_chain("application.credentials").and_return(credentials))
+      allow(Rails).to(receive(:env).and_return(nil))
+      allow(Rails).to(receive(:root).and_return(fixtures_root))
+      allow(Rails).to(receive(:application).and_return(rails_application))
+      allow(Rails.application).to(receive(:secrets).and_return(secrets))
+      allow(Rails.application).to(receive(:credentials).and_return(credentials))
     end
 
     it "merges secrets into application secrets" do
