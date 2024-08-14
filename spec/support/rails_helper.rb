@@ -5,10 +5,6 @@ module RailsHelper
     allow(Rails)
   end
 
-  def secrets_class
-    ActiveSupport::OrderedOptions
-  end
-
   def credentials_object
     ActiveSupport::EncryptedConfiguration.new(
       config_path: "file.enc",
