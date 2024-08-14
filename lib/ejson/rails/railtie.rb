@@ -6,8 +6,7 @@ module EJSON
     private_constant :Rails
 
     class Railtie < Rails::Railtie
-      singleton_class.attr_accessor(:ejson_secret_source, :set_secrets)
-      @set_secrets = true
+      singleton_class.attr_accessor(:ejson_secret_source)
 
       config.before_configuration do
         secrets = load_secrets_from_config || load_secrets_from_disk
@@ -15,7 +14,6 @@ module EJSON
 
         secrets = JSON.parse(secrets, symbolize_names: true)
 
-        Rails.application.secrets.deep_merge!(secrets) if set_secrets
         # Merging into `credentials.config` because in Rails 7.0, reading a credential with
         # Rails.application.credentials[:some_credential] won't work otherwise.
         Rails.application.credentials.config.deep_merge!(secrets) do |key|
