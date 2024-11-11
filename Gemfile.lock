@@ -47,7 +47,7 @@ GEM
     crass (1.0.6)
     diff-lcs (1.5.1)
     drb (2.2.1)
-    ejson (1.4.1)
+    ejson (1.5.3)
     erubi (1.13.0)
     i18n (1.14.6)
       concurrent-ruby (~> 1.0)
