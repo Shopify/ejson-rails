@@ -7,16 +7,17 @@ jobs:
     runs-on: ubuntu-latest
 
     strategy:
+      fail-fast: false
       matrix:
         entry:
           - name: Minimum Rails
             ruby: '3.1'
             gemfile: Gemfile.rails-min
           - name: Latest Rails
-            ruby: '3.3'
+            ruby: '3.4'
             gemfile: Gemfile.rails-latest
           - name: Edge Rails
-            ruby: '3.3'
+            ruby: '3.4'
             gemfile: "Gemfile.rails-edge"
 
     name: ${{ matrix.entry.name }}

@@ -2,4 +2,4 @@ source 'https://rubygems.org'
 
 eval_gemfile('../Gemfile')
 
-gem 'railties', '6.1'
+gem 'railties', github: 'rails/rails', branch: '7-0-stable'
