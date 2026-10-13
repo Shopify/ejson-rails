@@ -47,7 +47,7 @@ GEM
     date (3.5.1)
     diff-lcs (1.6.2)
     drb (2.2.3)
-    ejson (1.5.3)
+    ejson (1.6.0)
     erb (6.0.4)
     erubi (1.13.1)
     i18n (1.15.2)
